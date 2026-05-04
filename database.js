@@ -2,9 +2,7 @@ const fs   = require('fs');
 const path = require('path');
 
 const IS_VERCEL = !!process.env.VERCEL;
-const DB_PATH   = IS_VERCEL
-  ? '/tmp/school-data.json'
-  : path.join(__dirname, 'school-data.json');
+const DB_PATH   = IS_VERCEL ? '/tmp/school-data.json' : path.join(__dirname, 'school-data.json');
 
 const SEED = {
   faculty: [
@@ -16,10 +14,10 @@ const SEED = {
     { id:6, name:'Mr. Venkat Rao',     subject:'Social Studies', qualification:'MA History, B.Ed',      experience_years:16, photo_placeholder:'VR' },
   ],
   notices: [
-    { id:1, title:'Annual Day Celebrations',   content:'Annual Day will be held on 15th January 2025. All students are requested to participate in cultural programs. Parents are cordially invited to attend the grand celebration.',       category:'Event',   created_at:new Date(Date.now()-1*86400000).toISOString() },
-    { id:2, title:'Winter Vacation Schedule',  content:'School will remain closed from 25th December to 2nd January for Winter Vacations. Classes resume on 3rd January 2025.',                                                            category:'Holiday', created_at:new Date(Date.now()-2*86400000).toISOString() },
-    { id:3, title:'Class X Pre-Board Exams',   content:'Pre-board examinations for Class X begin from 10th January 2025. Students are advised to collect their admit cards from the office. Timetable is on the notice board.',            category:'Exam',    created_at:new Date(Date.now()-3*86400000).toISOString() },
-    { id:4, title:'New Library Books Arrival', content:'Over 500 new books have been added to the school library across Science, Literature and General Knowledge. Students can borrow from Monday onwards.',                              category:'General', created_at:new Date(Date.now()-4*86400000).toISOString() },
+    { id:1, title:'Annual Day Celebrations',   content:'Annual Day will be held on 15th January 2025. All students are requested to participate in cultural programs. Parents are cordially invited.',   category:'Event',   created_at:new Date(Date.now()-1*86400000).toISOString() },
+    { id:2, title:'Winter Vacation Schedule',  content:'School will remain closed from 25th December to 2nd January for Winter Vacations. Classes resume on 3rd January 2025.',                        category:'Holiday', created_at:new Date(Date.now()-2*86400000).toISOString() },
+    { id:3, title:'Class X Pre-Board Exams',   content:'Pre-board examinations for Class X begin from 10th January 2025. Students are advised to collect their admit cards from the office.',          category:'Exam',    created_at:new Date(Date.now()-3*86400000).toISOString() },
+    { id:4, title:'New Library Books Arrival', content:'Over 500 new books have been added to the school library across Science, Literature and General Knowledge. Students can borrow from Monday.',   category:'General', created_at:new Date(Date.now()-4*86400000).toISOString() },
   ],
   enquiries:  [],
   contacts:   [],
@@ -38,12 +36,11 @@ function load() {
   }
 }
 
-function save(data) {
-  fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2));
-}
+function save(data) { fs.writeFileSync(DB_PATH, JSON.stringify(data, null, 2)); }
 
 const db = {
-  all(table)        { return [...(load()[table] || [])].reverse(); },
+  all(table)         { return [...(load()[table] || [])].reverse(); },
+  count(table)       { return (load()[table] || []).length; },
   insert(table, row) {
     const data = load();
     data._counters[table] = (data._counters[table] || 0) + 1;
@@ -52,6 +49,14 @@ const db = {
     save(data);
     return newRow;
   },
+  update(table, id, fields) {
+    const data = load();
+    const idx = data[table].findIndex(r => r.id === id);
+    if (idx === -1) return false;
+    data[table][idx] = { ...data[table][idx], ...fields };
+    save(data);
+    return true;
+  },
   delete(table, id) {
     const data = load();
     const before = data[table].length;
@@ -59,7 +64,6 @@ const db = {
     save(data);
     return data[table].length < before;
   },
-  count(table) { return (load()[table] || []).length; },
 };
 
 module.exports = db;
