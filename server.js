@@ -77,6 +77,37 @@ app.delete('/api/notices/:id', (req, res) => {
   } catch(e) { res.status(500).json({ success:false, message:'Failed.' }); }
 });
 
+app.post('/api/faculty', (req, res) => {
+  try {
+    const { name, subject, qualification, experience_years } = req.body;
+    if (!name || !subject || !qualification || !experience_years)
+      return res.status(400).json({ success:false, message:'All fields required.' });
+    const initials = name.split(' ').filter(w=>w.length>1).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const member = db.insert('faculty', { name, subject, qualification, experience_years:parseInt(experience_years), photo_placeholder:initials });
+    res.json({ success:true, data:member, message:'Faculty member added successfully.' });
+  } catch(e) { res.status(500).json({ success:false, message:'Failed.' }); }
+});
+
+app.put('/api/faculty/:id', (req, res) => {
+  try {
+    const { name, subject, qualification, experience_years } = req.body;
+    if (!name || !subject || !qualification || !experience_years)
+      return res.status(400).json({ success:false, message:'All fields required.' });
+    const initials = name.split(' ').filter(w=>w.length>1).map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    const updated = db.update('faculty', parseInt(req.params.id,10), { name, subject, qualification, experience_years:parseInt(experience_years), photo_placeholder:initials });
+    if (!updated) return res.status(404).json({ success:false, message:'Faculty not found.' });
+    res.json({ success:true, message:'Faculty updated successfully.' });
+  } catch(e) { res.status(500).json({ success:false, message:'Failed.' }); }
+});
+
+app.delete('/api/faculty/:id', (req, res) => {
+  try {
+    const deleted = db.delete('faculty', parseInt(req.params.id, 10));
+    if (!deleted) return res.status(404).json({ success:false, message:'Not found.' });
+    res.json({ success:true, message:'Faculty member removed successfully.' });
+  } catch(e) { res.status(500).json({ success:false, message:'Failed.' }); }
+});
+
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
 });
