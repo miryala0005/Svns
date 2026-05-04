@@ -5,10 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin Panel – Sri Vidya Niketan School</title>
   <link rel="stylesheet" href="/style.css" />
+  <style>
+    .faculty-admin-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; }
+    .faculty-admin-card { background:var(--white); border:1px solid var(--border); border-radius:var(--radius); padding:1.25rem; display:flex; flex-direction:column; gap:0.5rem; }
+    .faculty-admin-card-top { display:flex; align-items:center; gap:0.75rem; margin-bottom:0.5rem; }
+    .faculty-admin-avatar { width:48px; height:48px; border-radius:50%; background:linear-gradient(135deg,var(--navy),var(--navy-light)); display:flex; align-items:center; justify-content:center; color:var(--gold); font-weight:700; font-size:1rem; flex-shrink:0; }
+    .faculty-admin-card h4 { color:var(--navy); font-size:0.95rem; margin:0; }
+    .faculty-admin-card .subj { color:var(--gold); font-size:0.8rem; font-weight:600; }
+    .faculty-admin-card .qual { color:var(--text-muted); font-size:0.78rem; }
+    .faculty-admin-card .exp  { color:var(--text-muted); font-size:0.78rem; }
+    .faculty-card-actions { display:flex; gap:0.5rem; margin-top:0.5rem; }
+    .edit-btn { background:rgba(10,35,66,0.1); color:var(--navy); padding:0.3rem 0.75rem; border-radius:4px; font-size:0.78rem; font-weight:600; transition:var(--transition); cursor:pointer; border:none; }
+    .edit-btn:hover { background:var(--navy); color:var(--white); }
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:9999; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:var(--white); border-radius:var(--radius); padding:2rem; width:90%; max-width:480px; box-shadow:var(--shadow-lg); }
+    .modal-box h3 { color:var(--navy); margin-bottom:1.25rem; }
+    .modal-actions { display:flex; gap:0.75rem; margin-top:1rem; }
+    .modal-save { background:var(--navy); color:var(--white); padding:0.65rem 1.5rem; border-radius:var(--radius-sm); font-weight:600; font-size:0.9rem; border:none; cursor:pointer; }
+    .modal-cancel { background:var(--off-white); color:var(--text); padding:0.65rem 1.5rem; border-radius:var(--radius-sm); font-weight:600; font-size:0.9rem; border:none; cursor:pointer; }
+  </style>
 </head>
 <body style="background:var(--off-white);min-height:100vh;">
 
-<!-- LOGIN SCREEN -->
 <div id="admin-login" class="admin-login">
   <div class="admin-login-card">
     <div class="admin-logo">SVN</div>
@@ -17,7 +36,7 @@
     <form id="admin-login-form" novalidate>
       <div class="form-group" style="text-align:left;">
         <label>Admin Password <span style="color:var(--error);">*</span></label>
-        <input type="password" id="admin-pass" placeholder="Enter admin password" required autocomplete="current-password" />
+        <input type="password" id="admin-pass" placeholder="Enter admin password" required />
       </div>
       <p id="admin-error" style="display:none;color:var(--error);font-size:0.85rem;margin-bottom:0.75rem;text-align:left;"></p>
       <button type="submit" class="form-submit" style="margin-top:0;">🔐 Login</button>
@@ -28,10 +47,7 @@
   </div>
 </div>
 
-<!-- ADMIN DASHBOARD -->
 <div id="admin-wrap" class="admin-wrap">
-
-  <!-- HEADER -->
   <div class="admin-header">
     <div>
       <h1>🏫 Admin Dashboard</h1>
@@ -44,131 +60,307 @@
   </div>
 
   <div class="admin-body">
-
-    <!-- STATS -->
     <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-num" id="stat-enquiries">—</div>
-        <div class="stat-label">📋 Admission Enquiries</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-contacts">—</div>
-        <div class="stat-label">✉️ Contact Messages</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-notices">—</div>
-        <div class="stat-label">📢 Active Notices</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-num" id="stat-faculty">—</div>
-        <div class="stat-label">👩‍🏫 Faculty Members</div>
-      </div>
+      <div class="stat-card"><div class="stat-num" id="stat-enquiries">—</div><div class="stat-label">📋 Enquiries</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-contacts">—</div><div class="stat-label">✉️ Messages</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-notices">—</div><div class="stat-label">📢 Notices</div></div>
+      <div class="stat-card"><div class="stat-num" id="stat-faculty">—</div><div class="stat-label">👩‍🏫 Faculty</div></div>
     </div>
 
-    <!-- ADD NOTICE -->
     <div class="admin-section">
-      <div class="admin-section-header">
-        <h2>📢 Add New Notice</h2>
-      </div>
+      <div class="admin-section-header"><h2>📢 Add New Notice</h2></div>
       <div class="admin-section-body">
         <form id="add-notice-form" class="add-notice-form">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
             <input type="text" name="n_title" placeholder="Notice Title *" required />
             <select name="n_category" required>
-              <option value="">— Select Category —</option>
+              <option value="">— Category —</option>
               <option value="Exam">Exam</option>
               <option value="Holiday">Holiday</option>
               <option value="Event">Event</option>
               <option value="General">General</option>
             </select>
           </div>
-          <textarea name="n_content" rows="3" placeholder="Notice content / details *" required></textarea>
-          <div>
-            <button type="submit" class="add-btn">➕ Add Notice</button>
-          </div>
+          <textarea name="n_content" rows="3" placeholder="Notice content *" required></textarea>
+          <button type="submit" class="add-btn">➕ Add Notice</button>
         </form>
       </div>
     </div>
 
-    <!-- NOTICES TABLE -->
     <div class="admin-section">
       <div class="admin-section-header">
         <h2>📋 All Notices</h2>
-        <span style="font-size:0.82rem;color:var(--text-muted);">Click Delete to remove a notice from the website</span>
+        <span style="font-size:0.82rem;color:var(--text-muted);">Tap Delete to remove</span>
       </div>
       <div class="admin-section-body">
         <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Title</th>
-              <th>Category</th>
-              <th>Date Posted</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody id="notices-tbody">
-            <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Title</th><th>Category</th><th>Date</th><th>Action</th></tr></thead>
+          <tbody id="notices-tbody"><tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- ENQUIRIES TABLE -->
     <div class="admin-section">
       <div class="admin-section-header">
-        <h2>📝 Admission Enquiries</h2>
-        <span style="font-size:0.82rem;color:var(--text-muted);">All enquiries submitted via the Admissions page</span>
+        <h2>👩‍🏫 Faculty Management</h2>
+        <button class="add-btn" id="add-faculty-btn" style="padding:0.4rem 1rem;font-size:0.85rem;">➕ Add Teacher</button>
       </div>
       <div class="admin-section-body">
+        <div class="faculty-admin-grid" id="faculty-admin-grid">
+          <p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:2rem;">Loading…</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="admin-section">
+      <div class="admin-section-header"><h2>📝 Admission Enquiries</h2></div>
+      <div class="admin-section-body">
         <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Parent Name</th>
-              <th>Student Name</th>
-              <th>Class Applying</th>
-              <th>Phone</th>
-              <th>Email</th>
-            </tr>
-          </thead>
-          <tbody id="enquiries-tbody">
-            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Date</th><th>Parent</th><th>Student</th><th>Class</th><th>Phone</th><th>Email</th></tr></thead>
+          <tbody id="enquiries-tbody"><tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <!-- CONTACT MESSAGES TABLE -->
     <div class="admin-section">
-      <div class="admin-section-header">
-        <h2>✉️ Contact Messages</h2>
-        <span style="font-size:0.82rem;color:var(--text-muted);">All messages submitted via the Contact page</span>
-      </div>
+      <div class="admin-section-header"><h2>✉️ Contact Messages</h2></div>
       <div class="admin-section-body">
         <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Date</th>
-              <th>Name</th>
-              <th>Email</th>
-              <th>Subject</th>
-              <th>Message</th>
-            </tr>
-          </thead>
-          <tbody id="contacts-tbody">
-            <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr>
-          </tbody>
+          <thead><tr><th>Date</th><th>Name</th><th>Email</th><th>Subject</th><th>Message</th></tr></thead>
+          <tbody id="contacts-tbody"><tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr></tbody>
         </table>
       </div>
     </div>
 
     <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);padding:1rem 0 2rem;">
-      Sri Vidya Niketan School Admin Panel · © 2025 · <a href="index.html" style="color:var(--gold);">Back to Website</a>
+      © 2025 Sri Vidya Niketan School · <a href="index.html" style="color:var(--gold);">Back to Website</a>
     </p>
+  </div>
+</div>
 
-  </div><!-- /admin-body -->
-</div><!-- /admin-wrap -->
+<div class="modal-overlay" id="faculty-modal">
+  <div class="modal-box">
+    <h3 id="modal-title">➕ Add Faculty Member</h3>
+    <input type="hidden" id="faculty-edit-id" value="" />
+    <div class="form-group">
+      <label>Full Name <span style="color:var(--error)">*</span></label>
+      <input type="text" id="f-name" placeholder="e.g. Mrs. Anitha Sharma" />
+    </div>
+    <div class="form-group">
+      <label>Subject <span style="color:var(--error)">*</span></label>
+      <input type="text" id="f-subject" placeholder="e.g. Mathematics" />
+    </div>
+    <div class="form-group">
+      <label>Qualification <span style="color:var(--error)">*</span></label>
+      <input type="text" id="f-qualification" placeholder="e.g. M.Sc, B.Ed" />
+    </div>
+    <div class="form-group">
+      <label>Years of Experience <span style="color:var(--error)">*</span></label>
+      <input type="number" id="f-experience" placeholder="e.g. 10" min="0" max="50" />
+    </div>
+    <p id="modal-error" style="color:var(--error);font-size:0.85rem;display:none;margin-top:0.5rem;"></p>
+    <div class="modal-actions">
+      <button class="modal-save" id="modal-save-btn">💾 Save</button>
+      <button class="modal-cancel" id="modal-cancel-btn">Cancel</button>
+    </div>
+  </div>
+</div>
 
 <script src="/main.js"></script>
+<script>
+const ADMIN_PASS   = 'svns@admin2024';
+const loginSection = document.getElementById('admin-login');
+const adminWrap    = document.getElementById('admin-wrap');
+
+if (sessionStorage.getItem('svns_admin') === 'true') showAdminPanel();
+
+document.getElementById('admin-login-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const pass = document.getElementById('admin-pass').value;
+  const err  = document.getElementById('admin-error');
+  if (pass === ADMIN_PASS) { sessionStorage.setItem('svns_admin','true'); showAdminPanel(); }
+  else { err.textContent = 'Incorrect password.'; err.style.display = 'block'; }
+});
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+  sessionStorage.removeItem('svns_admin'); location.reload();
+});
+
+async function showAdminPanel() {
+  loginSection.style.display = 'none';
+  adminWrap.style.display    = 'block';
+  await loadStats();
+  await loadAdminNotices();
+  await loadFacultyAdmin();
+  await loadAdminEnquiries();
+  await loadAdminContacts();
+  initAddNotice();
+  initFacultyModal();
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch('/api/admin/stats');
+    const d = await r.json();
+    if (d.success) {
+      document.getElementById('stat-enquiries').textContent = d.data.enquiries;
+      document.getElementById('stat-contacts').textContent  = d.data.contacts;
+      document.getElementById('stat-notices').textContent   = d.data.notices;
+      document.getElementById('stat-faculty').textContent   = d.data.faculty;
+    }
+  } catch {}
+}
+
+async function loadAdminNotices() {
+  try {
+    const r = await fetch('/api/notices');
+    const d = await r.json();
+    const tbody = document.getElementById('notices-tbody');
+    if (!d.data.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted)">No notices yet.</td></tr>'; return; }
+    tbody.innerHTML = d.data.map(n => `<tr>
+      <td>${n.title}</td>
+      <td><span class="notice-cat cat-${n.category.toLowerCase()}">${n.category}</span></td>
+      <td>${formatDate(n.created_at)}</td>
+      <td><button class="del-btn" onclick="deleteNotice(${n.id})">Delete</button></td>
+    </tr>`).join('');
+  } catch {}
+}
+
+function initAddNotice() {
+  document.getElementById('add-notice-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const form = e.target;
+    try {
+      const r = await fetch('/api/notices', { method:'POST', headers:{'Content-Type':'application/json'},
+        body: JSON.stringify({ title:form.n_title.value, content:form.n_content.value, category:form.n_category.value }) });
+      const d = await r.json();
+      if (d.success) { form.reset(); await loadStats(); await loadAdminNotices(); alert('✅ Notice added!'); }
+    } catch {}
+  });
+}
+
+window.deleteNotice = async (id) => {
+  if (!confirm('Delete this notice?')) return;
+  try {
+    const r = await fetch(`/api/notices/${id}`, { method:'DELETE' });
+    const d = await r.json();
+    if (d.success) { await loadStats(); await loadAdminNotices(); }
+  } catch {}
+};
+
+async function loadFacultyAdmin() {
+  try {
+    const r = await fetch('/api/faculty');
+    const d = await r.json();
+    const grid = document.getElementById('faculty-admin-grid');
+    if (!d.data.length) { grid.innerHTML = '<p style="color:var(--text-muted);text-align:center;padding:2rem;grid-column:1/-1;">No faculty yet.</p>'; return; }
+    grid.innerHTML = d.data.map(f => `
+      <div class="faculty-admin-card">
+        <div class="faculty-admin-card-top">
+          <div class="faculty-admin-avatar">${f.photo_placeholder}</div>
+          <div><h4>${f.name}</h4><div class="subj">📚 ${f.subject}</div></div>
+        </div>
+        <div class="qual">🎓 ${f.qualification}</div>
+        <div class="exp">⏱ ${f.experience_years} Years Experience</div>
+        <div class="faculty-card-actions">
+          <button class="edit-btn" onclick="openEditModal(${f.id},'${f.name.replace(/'/g,"\\'")}','${f.subject.replace(/'/g,"\\'")}','${f.qualification.replace(/'/g,"\\'")}',${f.experience_years})">✏️ Edit</button>
+          <button class="del-btn" onclick="deleteFaculty(${f.id})">Delete</button>
+        </div>
+      </div>`).join('');
+  } catch {}
+}
+
+function initFacultyModal() {
+  document.getElementById('add-faculty-btn').addEventListener('click', openAddModal);
+  document.getElementById('modal-cancel-btn').addEventListener('click', closeModal);
+  document.getElementById('modal-save-btn').addEventListener('click', saveFaculty);
+}
+
+function openAddModal() {
+  document.getElementById('modal-title').textContent   = '➕ Add Faculty Member';
+  document.getElementById('faculty-edit-id').value     = '';
+  document.getElementById('f-name').value              = '';
+  document.getElementById('f-subject').value           = '';
+  document.getElementById('f-qualification').value     = '';
+  document.getElementById('f-experience').value        = '';
+  document.getElementById('modal-error').style.display = 'none';
+  document.getElementById('faculty-modal').classList.add('open');
+}
+
+window.openEditModal = (id, name, subject, qualification, experience) => {
+  document.getElementById('modal-title').textContent   = '✏️ Edit Faculty Member';
+  document.getElementById('faculty-edit-id').value     = id;
+  document.getElementById('f-name').value              = name;
+  document.getElementById('f-subject').value           = subject;
+  document.getElementById('f-qualification').value     = qualification;
+  document.getElementById('f-experience').value        = experience;
+  document.getElementById('modal-error').style.display = 'none';
+  document.getElementById('faculty-modal').classList.add('open');
+};
+
+function closeModal() { document.getElementById('faculty-modal').classList.remove('open'); }
+
+async function saveFaculty() {
+  const id            = document.getElementById('faculty-edit-id').value;
+  const name          = document.getElementById('f-name').value.trim();
+  const subject       = document.getElementById('f-subject').value.trim();
+  const qualification = document.getElementById('f-qualification').value.trim();
+  const experience    = document.getElementById('f-experience').value.trim();
+  const errEl         = document.getElementById('modal-error');
+  if (!name || !subject || !qualification || !experience) {
+    errEl.textContent = 'Please fill all fields.'; errEl.style.display = 'block'; return;
+  }
+  try {
+    const r = await fetch(id ? `/api/faculty/${id}` : '/api/faculty', {
+      method: id ? 'PUT' : 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ name, subject, qualification, experience_years: experience })
+    });
+    const d = await r.json();
+    if (d.success) { closeModal(); await loadStats(); await loadFacultyAdmin(); alert(id ? '✅ Faculty updated!' : '✅ Faculty added!'); }
+    else { errEl.textContent = d.message; errEl.style.display = 'block'; }
+  } catch { errEl.textContent = 'Error. Please try again.'; errEl.style.display = 'block'; }
+}
+
+window.deleteFaculty = async (id) => {
+  if (!confirm('Remove this faculty member?')) return;
+  try {
+    const r = await fetch(`/api/faculty/${id}`, { method:'DELETE' });
+    const d = await r.json();
+    if (d.success) { await loadStats(); await loadFacultyAdmin(); }
+  } catch {}
+};
+
+async function loadAdminEnquiries() {
+  try {
+    const r = await fetch('/api/admin/enquiries');
+    const d = await r.json();
+    const tbody = document.getElementById('enquiries-tbody');
+    if (!d.data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted)">No enquiries yet.</td></tr>'; return; }
+    tbody.innerHTML = d.data.map(e => `<tr>
+      <td>${formatDate(e.created_at)}</td><td>${e.parent_name}</td><td>${e.student_name}</td>
+      <td>${e.class_applying}</td><td>${e.phone}</td><td>${e.email||'—'}</td>
+    </tr>`).join('');
+  } catch {}
+}
+
+async function loadAdminContacts() {
+  try {
+    const r = await fetch('/api/admin/contacts');
+    const d = await r.json();
+    const tbody = document.getElementById('contacts-tbody');
+    if (!d.data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted)">No messages yet.</td></tr>'; return; }
+    tbody.innerHTML = d.data.map(c => `<tr>
+      <td>${formatDate(c.created_at)}</td><td>${c.name}</td><td>${c.email}</td>
+      <td>${c.subject}</td><td>${c.message.slice(0,60)}${c.message.length>60?'...':''}</td>
+    </tr>`).join('');
+  } catch {}
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  return new Date(dateStr).toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+}
+</script>
 </body>
 </html>
