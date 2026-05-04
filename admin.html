@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel – Sri Vidya Niketan School</title>
+  <link rel="stylesheet" href="/style.css" />
+</head>
+<body style="background:var(--off-white);min-height:100vh;">
+
+<!-- LOGIN SCREEN -->
+<div id="admin-login" class="admin-login">
+  <div class="admin-login-card">
+    <div class="admin-logo">SVN</div>
+    <h1>Admin Panel</h1>
+    <p>Sri Vidya Niketan School · Hyderabad</p>
+    <form id="admin-login-form" novalidate>
+      <div class="form-group" style="text-align:left;">
+        <label>Admin Password <span style="color:var(--error);">*</span></label>
+        <input type="password" id="admin-pass" placeholder="Enter admin password" required autocomplete="current-password" />
+      </div>
+      <p id="admin-error" style="display:none;color:var(--error);font-size:0.85rem;margin-bottom:0.75rem;text-align:left;"></p>
+      <button type="submit" class="form-submit" style="margin-top:0;">🔐 Login</button>
+    </form>
+    <p style="margin-top:1.5rem;font-size:0.78rem;color:var(--text-muted);">
+      <a href="index.html" style="color:var(--gold);">← Back to Website</a>
+    </p>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="admin-wrap" class="admin-wrap">
+
+  <!-- HEADER -->
+  <div class="admin-header">
+    <div>
+      <h1>🏫 Admin Dashboard</h1>
+      <span>Sri Vidya Niketan School · Hyderabad</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:1rem;">
+      <a href="index.html" style="color:rgba(255,255,255,0.6);font-size:0.82rem;">← View Website</a>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
+  </div>
+
+  <div class="admin-body">
+
+    <!-- STATS -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-num" id="stat-enquiries">—</div>
+        <div class="stat-label">📋 Admission Enquiries</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-contacts">—</div>
+        <div class="stat-label">✉️ Contact Messages</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-notices">—</div>
+        <div class="stat-label">📢 Active Notices</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" id="stat-faculty">—</div>
+        <div class="stat-label">👩‍🏫 Faculty Members</div>
+      </div>
+    </div>
+
+    <!-- ADD NOTICE -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <h2>📢 Add New Notice</h2>
+      </div>
+      <div class="admin-section-body">
+        <form id="add-notice-form" class="add-notice-form">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <input type="text" name="n_title" placeholder="Notice Title *" required />
+            <select name="n_category" required>
+              <option value="">— Select Category —</option>
+              <option value="Exam">Exam</option>
+              <option value="Holiday">Holiday</option>
+              <option value="Event">Event</option>
+              <option value="General">General</option>
+            </select>
+          </div>
+          <textarea name="n_content" rows="3" placeholder="Notice content / details *" required></textarea>
+          <div>
+            <button type="submit" class="add-btn">➕ Add Notice</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- NOTICES TABLE -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <h2>📋 All Notices</h2>
+        <span style="font-size:0.82rem;color:var(--text-muted);">Click Delete to remove a notice from the website</span>
+      </div>
+      <div class="admin-section-body">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Category</th>
+              <th>Date Posted</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="notices-tbody">
+            <tr><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ENQUIRIES TABLE -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <h2>📝 Admission Enquiries</h2>
+        <span style="font-size:0.82rem;color:var(--text-muted);">All enquiries submitted via the Admissions page</span>
+      </div>
+      <div class="admin-section-body">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Parent Name</th>
+              <th>Student Name</th>
+              <th>Class Applying</th>
+              <th>Phone</th>
+              <th>Email</th>
+            </tr>
+          </thead>
+          <tbody id="enquiries-tbody">
+            <tr><td colspan="6" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CONTACT MESSAGES TABLE -->
+    <div class="admin-section">
+      <div class="admin-section-header">
+        <h2>✉️ Contact Messages</h2>
+        <span style="font-size:0.82rem;color:var(--text-muted);">All messages submitted via the Contact page</span>
+      </div>
+      <div class="admin-section-body">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Subject</th>
+              <th>Message</th>
+            </tr>
+          </thead>
+          <tbody id="contacts-tbody">
+            <tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-muted);">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);padding:1rem 0 2rem;">
+      Sri Vidya Niketan School Admin Panel · © 2025 · <a href="index.html" style="color:var(--gold);">Back to Website</a>
+    </p>
+
+  </div><!-- /admin-body -->
+</div><!-- /admin-wrap -->
+
+<script src="/main.js"></script>
+</body>
+</html>
